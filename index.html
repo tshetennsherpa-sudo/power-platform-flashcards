@@ -1,369 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power Platform Administrator Flashcards</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <style>
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-        .transform-style-preserve-3d {
-            transform-style: preserve-3d;
-        }
-        .backface-hidden {
-            backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Power Platform Flashcards</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right, #1e3a8a, #7c3aed);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+    height: 100vh;
+    margin: 0;
+  }
+  .flashcard {
+    background: white;
+    color: #1e3a8a;
+    width: 600px;
+    height: 350px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .inner-card {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    flex-grow: 1;
+    cursor: pointer;
+    padding: 2rem;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .flipped {
+    transform: rotateY(180deg);
+  }
+  .front, .back {
+    backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+  }
+  .front {
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .back {
+    transform: rotateY(180deg);
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+  .back h3 {
+    margin-top: 0;
+    color: #7c3aed;
+  }
+  .footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+  }
+  button {
+    background: #7c3aed;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #5b21b6;
+  }
+</style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { ChevronLeft, ChevronRight, RotateCcw, Shuffle, BookOpen, Trophy, Eye, EyeOff } = lucide;
+  <div class="flashcard" id="flashcard">
+    <div class="inner-card" id="innerCard">
+      <div class="front" id="cardFront"></div>
+      <div class="back" id="cardBack">
+        <h3 id="cardTerm"></h3>
+        <p><strong>Definition:</strong> <span id="cardDef"></span></p>
+        <p><strong>Importance:</strong> <span id="cardImp"></span></p>
+      </div>
+    </div>
+    <div class="footer">
+      <button id="prevBtn">Previous</button>
+      <button id="flipBtn">Flip</button>
+      <button id="nextBtn">Next</button>
+    </div>
+  </div>
 
-        const PowerPlatformFlashcards = () => {
-            const [currentCard, setCurrentCard] = useState(0);
-            const [isFlipped, setIsFlipped] = useState(false);
-            const [shuffledCards, setShuffledCards] = useState([]);
-            const [showProgress, setShowProgress] = useState(true);
+  <script>
+    const flashcards = [
+      {
+        term: "Power Platform",
+        definition: "A comprehensive suite of tools that includes Power Apps, Power Automate, Power BI, and Power Virtual Agents. These tools enable data analysis, process automation, app creation, and intelligent chatbot deployment.",
+        importance: "Understanding the suite and its capabilities is foundational for managing solutions and supporting users."
+      },
+      {
+        term: "Power Platform Administrator",
+        definition: "Responsible for the governance, environment management, security, capacity planning, monitoring, and compliance across the tenant. This role ensures the platform is secure, scalable, and aligns with organizational standards, distinguishing it from Makers/Developers who build apps, flows, or dashboards.",
+        importance: "This role involves strategic oversight, not just technical building."
+      },
+      {
+        term: "Environments (Power Platform)",
+        definition: "Containers used for apps, flows, and data. Administrators use the Power Platform Admin Center to create, configure, assign permissions, and set policies for different stages like development, testing, and production.",
+        importance: "Correct environment management ensures security, proper resource allocation, and overall governance."
+      },
+      {
+        term: "Data Loss Prevention (DLP) Policies",
+        definition: "Critical policies that restrict data movement between connectors to protect sensitive information, for example, by blocking personal connectors in finance environments. They define which connectors can be used together (e.g., Business vs. Non-Business).",
+        importance: "DLP is essential for regulatory compliance, reducing risk, and preventing data leakage across connectors."
+      },
+      {
+        term: "Center of Excellence (CoE)",
+        definition: "A framework or set of best practices often orchestrated for platform governance, including implementing DLP, role-based access controls, naming conventions, regular audits, and platform usage monitoring. The CoE Starter Kit is a Microsoft solution providing Power BI dashboards, apps, and flows for governance and adoption.",
+        importance: "Good governance ensures maintainability, security, scalability, and compliance. A CoE drives adoption, ensures best practices, reduces support burden, and maximizes platform ROI."
+      },
+      {
+        term: "Power Platform Admin Center",
+        definition: "The central tool for administrators to manage Power Platform. It is used to create and configure environments, assign permissions, set policies, review analytics, monitor Dataverse capacity, and track daily active users, storage consumption, and API request limits.",
+        importance: "Provides centralized management for various administrative tasks, crucial for security and governance."
+      },
+      {
+        term: "Role-Based Access Control (RBAC)",
+        definition: "A security model that applies the least-privilege model by using security roles and mapping Azure AD groups to control access to environments and resources. This includes assigning security roles like Environment Admin or System Administrator.",
+        importance: "Ensures data protection, proper access, business continuity, and compliance by limiting user permissions to only what is necessary."
+      },
+      {
+        term: "Power Automate (Admin Context)",
+        definition: "A Power Platform component leveraged by administrators for automating scheduled tasks such as alerts, monitoring, proactively identifying and reassigning critical processes like ownerless flows, or notifying when Dataverse storage exceeds a threshold.",
+        importance: "Automation using Power Automate reduces manual errors, accelerates administrative workflows, and improves reliability."
+      },
+      {
+        term: "PowerShell cmdlets (for Power Platform)",
+        definition: "Command-line tools used by administrators for platform automation, including tasks like user provisioning, reporting, performing quarterly permission audits, exporting all flows in a tenant, and checking connector usage for compliance.",
+        importance: "Enhances operational efficiency by automating administrative tasks and provides granular insights into platform components."
+      },
+      {
+        term: "Troubleshooting Methodology (Power Platform)",
+        definition: "A systematic approach to diagnosing issues, involving reviewing analytics/tools in the Admin Center, checking for inefficient queries, excessive loops, connector throttling, or poorly designed data structures. It also includes checking flow run history, error logs, verifying connector authentication, and validating API limits.",
+        importance: "Rapid troubleshooting minimizes downtime and boosts user trust, maintaining user productivity and preventing recurring issues through root cause analysis."
+      },
+      {
+        term: "Capacity Management (Power Platform)",
+        definition: "The process of monitoring Dataverse database, file, and log capacity in the Admin Center, assigning appropriate licenses (e.g., Power Apps per App/Per User), and using capacity add-ons for scaling Dataverse storage and features.",
+        importance: "Prevents service disruptions, controls costs, and ensures optimal user experience across the organization. Mismanaged licensing can lead to unexpected costs."
+      },
+      {
+        term: "Azure Active Directory (Azure AD) Integration",
+        definition: "Integrating Power Platform with Azure AD to implement conditional access policies, multi-factor authentication (MFA), and role-based access control (RBAC). It's used for mapping AD groups to environment access and for comprehensive role management.",
+        importance: "Crucial for robust security, ensuring regulatory compliance, and maintaining user trust within the platform."
+      },
+      {
+        term: "On-premises Data Gateway",
+        definition: "A service installed, configured, and maintained by administrators to create gateway clusters for high availability, enabling Power Platform to securely connect to on-premises systems and data sources.",
+        importance: "Facilitates secure data access and integration with legacy or on-premises systems, often necessary for meeting compliance requirements like SOX."
+      },
+      {
+        term: "Application Lifecycle Management (ALM)",
+        definition: "A structured process for managing the lifecycle of applications within Power Platform. It includes environment provisioning, solution management (managed/unmanaged), setting up CI/CD (Continuous Integration/Continuous Deployment) pipelines, version control, and implementing backup/recovery strategies.",
+        importance: "Ensures reliable application delivery, reduces deployment risks, and maintains system stability across development lifecycles."
+      },
+      {
+        term: "CoE Starter Kit",
+        definition: "A readily available set of Power BI dashboards, apps, and flows from Microsoft designed to assist with Power Platform governance and adoption. It provides insights into who is building resources, connector usage, orphaned resources, and DLP non-compliance.",
+        importance: "Helps administrators identify unused apps, automate maker onboarding, track adoption metrics, and foster secure innovation."
+      },
+      {
+        term: "Power BI (Admin Context)",
+        definition: "A Power Platform component primarily used for data analysis and reporting. Within an administrative context, Power BI dashboards are leveraged, often via the CoE Starter Kit, to monitor platform adoption, track ROI, analyze usage patterns, and report on compliance.",
+        importance: "Provides crucial insights and comprehensive reporting for effective platform management and strategic decision-making."
+      },
+      {
+        term: "Connector Throttling",
+        definition: "A performance limitation where the rate at which Power Platform connectors can make requests to external services or APIs is restricted. Exceeding these limits can lead to performance issues and errors in apps or flows.",
+        importance: "Identifying connector throttling is a key step in troubleshooting performance issues to minimize downtime and improve user experience."
+      },
+      {
+        term: "Least-Privilege Model",
+        definition: "A fundamental security principle where users or processes are granted only the absolute minimum permissions necessary to perform their required tasks. In Power Platform, this involves carefully assigning security roles and managing access.",
+        importance: "Ensures robust data protection, minimizes the attack surface, and helps maintain compliance by restricting unnecessary access to sensitive resources."
+      },
+      {
+        term: "Solution Management (ALM component)",
+        definition: "The practice of packaging and deploying Power Platform components (apps, flows, Dataverse tables) using managed and unmanaged solutions. This is a key part of Application Lifecycle Management.",
+        importance: "Essential for proper code deployment, ensuring consistency across environments, facilitating version control, and maintaining system stability throughout the development lifecycle."
+      },
+      {
+        term: "Disaster Recovery and Business Continuity (DR/BC) Planning",
+        definition: "The strategic process of preparing for and recovering from disruptive events. In Power Platform, this involves implementing automated environment backups, solution exports, data exports, considering multi-region deployments, documenting and testing recovery procedures, and defining Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO).",
+        importance: "Ensures business continuity, minimizes data loss, and maintains critical service availability during unexpected disruptions."
+      }
+    ];
 
-            const flashcards = [
-                {
-                    term: "Power Platform",
-                    definition: "A comprehensive suite of tools that includes Power Apps, Power Automate, Power BI, and Power Virtual Agents. These tools enable data analysis, process automation, app creation, and intelligent chatbot deployment.",
-                    importance: "Understanding the suite and its capabilities is foundational for managing solutions and supporting users."
-                },
-                {
-                    term: "Power Platform Administrator",
-                    definition: "Responsible for the governance, environment management, security, capacity planning, monitoring, and compliance across the tenant. This role ensures the platform is secure, scalable, and aligns with organizational standards, distinguishing it from Makers/Developers who build apps, flows, or dashboards.",
-                    importance: "This role involves strategic oversight, not just technical building."
-                },
-                {
-                    term: "Environments (Power Platform)",
-                    definition: "Containers used for apps, flows, and data. Administrators use the Power Platform Admin Center to create, configure, assign permissions, and set policies for different stages like development, testing, and production.",
-                    importance: "Correct environment management ensures security, proper resource allocation, and overall governance."
-                },
-                {
-                    term: "Data Loss Prevention (DLP) Policies",
-                    definition: "Critical policies that restrict data movement between connectors to protect sensitive information, for example, by blocking personal connectors in finance environments. They define which connectors can be used together (e.g., Business vs. Non-Business).",
-                    importance: "DLP is essential for regulatory compliance, reducing risk, and preventing data leakage across connectors."
-                },
-                {
-                    term: "Center of Excellence (CoE)",
-                    definition: "A framework or set of best practices often orchestrated for platform governance, including implementing DLP, role-based access controls, naming conventions, regular audits, and platform usage monitoring. The CoE Starter Kit is a Microsoft solution providing Power BI dashboards, apps, and flows for governance and adoption.",
-                    importance: "Good governance ensures maintainability, security, scalability, and compliance. A CoE drives adoption, ensures best practices, reduces support burden, and maximizes platform ROI."
-                },
-                {
-                    term: "Power Platform Admin Center",
-                    definition: "The central tool for administrators to manage Power Platform. It is used to create and configure environments, assign permissions, set policies, review analytics, monitor Dataverse capacity, and track daily active users, storage consumption, and API request limits.",
-                    importance: "Provides centralized management for various administrative tasks, crucial for security and governance."
-                },
-                {
-                    term: "Role-Based Access Control (RBAC)",
-                    definition: "A security model that applies the least-privilege model by using security roles and mapping Azure AD groups to control access to environments and resources. This includes assigning security roles like Environment Admin or System Administrator.",
-                    importance: "Ensures data protection, proper access, business continuity, and compliance by limiting user permissions to only what is necessary."
-                },
-                {
-                    term: "Power Automate (Admin Context)",
-                    definition: "A Power Platform component leveraged by administrators for automating scheduled tasks such as alerts, monitoring, proactively identifying and reassigning critical processes like ownerless flows, or notifying when Dataverse storage exceeds a threshold.",
-                    importance: "Automation using Power Automate reduces manual errors, accelerates administrative workflows, and improves reliability."
-                },
-                {
-                    term: "PowerShell cmdlets (for Power Platform)",
-                    definition: "Command-line tools used by administrators for platform automation, including tasks like user provisioning, reporting, performing quarterly permission audits, exporting all flows in a tenant, and checking connector usage for compliance.",
-                    importance: "Enhances operational efficiency by automating administrative tasks and provides granular insights into platform components."
-                },
-                {
-                    term: "Troubleshooting Methodology (Power Platform)",
-                    definition: "A systematic approach to diagnosing issues, involving reviewing analytics/tools in the Admin Center, checking for inefficient queries, excessive loops, connector throttling, or poorly designed data structures. It also includes checking flow run history, error logs, verifying connector authentication, and validating API limits.",
-                    importance: "Rapid troubleshooting minimizes downtime and boosts user trust, maintaining user productivity and preventing recurring issues through root cause analysis."
-                },
-                {
-                    term: "Capacity Management (Power Platform)",
-                    definition: "The process of monitoring Dataverse database, file, and log capacity in the Admin Center, assigning appropriate licenses (e.g., Power Apps per App/Per User), and using capacity add-ons for scaling Dataverse storage and features.",
-                    importance: "Prevents service disruptions, controls costs, and ensures optimal user experience across the organization. Mismanaged licensing can lead to unexpected costs."
-                },
-                {
-                    term: "Azure Active Directory (Azure AD) Integration",
-                    definition: "Integrating Power Platform with Azure AD to implement conditional access policies, multi-factor authentication (MFA), and role-based access control (RBAC). It's used for mapping AD groups to environment access and for comprehensive role management.",
-                    importance: "Crucial for robust security, ensuring regulatory compliance, and maintaining user trust within the platform."
-                },
-                {
-                    term: "On-premises Data Gateway",
-                    definition: "A service installed, configured, and maintained by administrators to create gateway clusters for high availability, enabling Power Platform to securely connect to on-premises systems and data sources.",
-                    importance: "Facilitates secure data access and integration with legacy or on-premises systems, often necessary for meeting compliance requirements like SOX."
-                },
-                {
-                    term: "Application Lifecycle Management (ALM)",
-                    definition: "A structured process for managing the lifecycle of applications within Power Platform. It includes environment provisioning, solution management (managed/unmanaged), setting up CI/CD (Continuous Integration/Continuous Deployment) pipelines, version control, and implementing backup/recovery strategies.",
-                    importance: "Ensures reliable application delivery, reduces deployment risks, and maintains system stability across development lifecycles."
-                },
-                {
-                    term: "CoE Starter Kit",
-                    definition: "A readily available set of Power BI dashboards, apps, and flows from Microsoft designed to assist with Power Platform governance and adoption. It provides insights into who is building resources, connector usage, orphaned resources, and DLP non-compliance.",
-                    importance: "Helps administrators identify unused apps, automate maker onboarding, track adoption metrics, and foster secure innovation."
-                },
-                {
-                    term: "Power BI (Admin Context)",
-                    definition: "A Power Platform component primarily used for data analysis and reporting. Within an administrative context, Power BI dashboards are leveraged, often via the CoE Starter Kit, to monitor platform adoption, track ROI, analyze usage patterns, and report on compliance.",
-                    importance: "Provides crucial insights and comprehensive reporting for effective platform management and strategic decision-making."
-                },
-                {
-                    term: "Connector Throttling",
-                    definition: "A performance limitation where the rate at which Power Platform connectors can make requests to external services or APIs is restricted. Exceeding these limits can lead to performance issues and errors in apps or flows.",
-                    importance: "Identifying connector throttling is a key step in troubleshooting performance issues to minimize downtime and improve user experience."
-                },
-                {
-                    term: "Least-Privilege Model",
-                    definition: "A fundamental security principle where users or processes are granted only the absolute minimum permissions necessary to perform their required tasks. In Power Platform, this involves carefully assigning security roles and managing access.",
-                    importance: "Ensures robust data protection, minimizes the attack surface, and helps maintain compliance by restricting unnecessary access to sensitive resources."
-                },
-                {
-                    term: "Solution Management (ALM component)",
-                    definition: "The practice of packaging and deploying Power Platform components (apps, flows, Dataverse tables) using managed and unmanaged solutions. This is a key part of Application Lifecycle Management.",
-                    importance: "Essential for proper code deployment, ensuring consistency across environments, facilitating version control, and maintaining system stability throughout the development lifecycle."
-                },
-                {
-                    term: "Disaster Recovery and Business Continuity (DR/BC) Planning",
-                    definition: "The strategic process of preparing for and recovering from disruptive events. In Power Platform, this involves implementing automated environment backups, solution exports, data exports, considering multi-region deployments, documenting and testing recovery procedures, and defining Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO).",
-                    importance: "Ensures business continuity, minimizes data loss, and maintains critical service availability during unexpected disruptions."
-                }
-            ];
+    let currentIndex = 0;
+    const front = document.getElementById('cardFront');
+    const back = document.getElementById('cardBack');
+    const term = document.getElementById('cardTerm');
+    const def = document.getElementById('cardDef');
+    const imp = document.getElementById('cardImp');
+    const innerCard = document.getElementById('innerCard');
 
-            useEffect(() => {
-                setShuffledCards([...flashcards]);
-            }, []);
+    function renderCard(index) {
+      const card = flashcards[index];
+      front.textContent = card.term;
+      term.textContent = card.term;
+      def.textContent = card.definition;
+      imp.textContent = card.importance;
+      if(innerCard.classList.contains('flipped')) {
+        innerCard.classList.remove('flipped');
+      }
+    }
 
-            const nextCard = () => {
-                setCurrentCard((prev) => (prev + 1) % shuffledCards.length);
-                setIsFlipped(false);
-            };
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % flashcards.length;
+      renderCard(currentIndex);
+    });
 
-            const prevCard = () => {
-                setCurrentCard((prev) => (prev - 1 + shuffledCards.length) % shuffledCards.length);
-                setIsFlipped(false);
-            };
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+      renderCard(currentIndex);
+    });
 
-            const flipCard = () => {
-                setIsFlipped(!isFlipped);
-            };
+    document.getElementById('flipBtn').addEventListener('click', () => {
+      innerCard.classList.toggle('flipped');
+    });
 
-            const shuffleCards = () => {
-                const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
-                setShuffledCards(shuffled);
-                setCurrentCard(0);
-                setIsFlipped(false);
-            };
-
-            const resetCards = () => {
-                setShuffledCards([...flashcards]);
-                setCurrentCard(0);
-                setIsFlipped(false);
-            };
-
-            const currentCardData = shuffledCards[currentCard] || flashcards[0];
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 p-4">
-                    {/* PowerPoint-style Header */}
-                    <div className="max-w-6xl mx-auto mb-6">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <BookOpen className="w-8 h-8 text-white" />
-                                    <div>
-                                        <h1 className="text-2xl font-bold text-white">Power Platform Administrator</h1>
-                                        <p className="text-blue-200">Interactive Study Flashcards</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Trophy className="w-6 h-6 text-yellow-400" />
-                                    <span className="text-white font-semibold">{shuffledCards.length} Cards</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    {showProgress && (
-                        <div className="max-w-4xl mx-auto mb-6">
-                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-white font-medium">Progress</span>
-                                    <button
-                                        onClick={() => setShowProgress(false)}
-                                        className="text-white/70 hover:text-white"
-                                    >
-                                        <EyeOff className="w-4 h-4" />
-                                    </button>
-                                </div>
-                                <div className="w-full bg-white/20 rounded-full h-2">
-                                    <div 
-                                        className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${((currentCard + 1) / shuffledCards.length) * 100}%` }}
-                                    ></div>
-                                </div>
-                                <div className="flex justify-between text-sm text-blue-200 mt-1">
-                                    <span>Card {currentCard + 1} of {shuffledCards.length}</span>
-                                    <span>{Math.round(((currentCard + 1) / shuffledCards.length) * 100)}% Complete</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {!showProgress && (
-                        <div className="max-w-4xl mx-auto mb-6 flex justify-center">
-                            <button
-                                onClick={() => setShowProgress(true)}
-                                className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20 text-white hover:bg-white/20 transition-colors"
-                            >
-                                <Eye className="w-4 h-4" />
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Main Flashcard */}
-                    <div className="max-w-4xl mx-auto mb-8">
-                        <div className="relative perspective-1000">
-                            <div 
-                                className={`relative w-full h-96 cursor-pointer transform-style-preserve-3d transition-transform duration-700 ${
-                                    isFlipped ? 'rotate-y-180' : ''
-                                }`}
-                                onClick={flipCard}
-                            >
-                                {/* Front of card - Term */}
-                                <div className="absolute inset-0 w-full h-full backface-hidden">
-                                    <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-2xl p-8 h-full border-l-8 border-blue-500">
-                                        <div className="flex flex-col justify-center h-full text-center">
-                                            <div className="mb-4">
-                                                <span className="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
-                                                    TERM
-                                                </span>
-                                            </div>
-                                            <h2 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
-                                                {currentCardData.term}
-                                            </h2>
-                                            <p className="text-gray-600 text-lg">
-                                                Click to reveal definition and importance
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Back of card - Definition & Importance */}
-                                <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-                                    <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-2xl p-8 h-full border-l-8 border-purple-500">
-                                        <div className="h-full flex flex-col">
-                                            <div className="mb-6">
-                                                <span className="inline-block bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
-                                                    DEFINITION & IMPORTANCE
-                                                </span>
-                                                <h3 className="text-xl font-bold text-gray-800 mb-2">
-                                                    {currentCardData.term}
-                                                </h3>
-                                            </div>
-                                            
-                                            <div className="flex-1 space-y-4 text-left">
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                                        Definition:
-                                                    </h4>
-                                                    <p className="text-gray-600 leading-relaxed pl-4">
-                                                        {currentCardData.definition}
-                                                    </p>
-                                                </div>
-                                                
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                                        <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                                                        Why It's Important:
-                                                    </h4>
-                                                    <p className="text-gray-600 leading-relaxed pl-4">
-                                                        {currentCardData.importance}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Controls */}
-                    <div className="max-w-4xl mx-auto">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                            <div className="flex flex-wrap justify-center gap-4">
-                                <button
-                                    onClick={prevCard}
-                                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition-colors font-medium"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                    Previous
-                                </button>
-                                
-                                <button
-                                    onClick={flipCard}
-                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition-colors font-medium"
-                                >
-                                    <RotateCcw className="w-5 h-5" />
-                                    {isFlipped ? 'Show Term' : 'Show Definition'}
-                                </button>
-                                
-                                <button
-                                    onClick={nextCard}
-                                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition-colors font-medium"
-                                >
-                                    Next
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                                
-                                <button
-                                    onClick={shuffleCards}
-                                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
-                                >
-                                    <Shuffle className="w-5 h-5" />
-                                    Shuffle
-                                </button>
-                                
-                                <button
-                                    onClick={resetCards}
-                                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
-                                >
-                                    Reset Order
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Study Tips */}
-                    <div className="max-w-4xl mx-auto mt-8">
-                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-                            <h3 className="text-white font-semibold mb-3">💡 Study Tips</h3>
-                            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-200">
-                                <div>• Read the term first and try to recall the definition</div>
-                                <div>• Focus on understanding the "why it's important" section</div>
-                                <div>• Use shuffle mode to test your knowledge randomly</div>
-                                <div>• Review cards you find challenging multiple times</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<PowerPlatformFlashcards />);
-    </script>
+    // Initial render
+    renderCard(currentIndex);
+  </script>
 </body>
 </html>
